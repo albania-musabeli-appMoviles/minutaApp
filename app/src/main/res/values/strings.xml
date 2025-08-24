@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MinutaApp</string>
+    <string name="title_activity_registro">Registro</string>
+    <string name="title_activity_login">Login</string>
 </resources>
