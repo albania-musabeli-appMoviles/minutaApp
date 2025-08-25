@@ -37,62 +37,41 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.minutaapp.SimpleTopBar
 
-val registros = mutableListOf<Map<String, String>>()
-
-fun guardarRegistro(
-    nombre: String,
-    correo: String,
-    password: String,
-    pais: String,
-    noticias: Boolean,
-    ofertas: Boolean
-) {
-    val registro = mapOf(
-        "nombre" to nombre,
-        "correo" to correo,
-        "password" to password,
-        "pais" to pais,
-        "recibeNoticias" to noticias.toString(),
-        "recibeOfertas" to ofertas.toString()
-    )
-    registros.add(registro)
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(onBack: () -> Unit) {
-    var nombre by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val paises = listOf("Chile", "Argentina", "Perú", "México")
-    var paisExpanded by remember { mutableStateOf(false) }
-    var paisSelected by remember { mutableStateOf(paises.first()) }
-    var recibeNoticias by remember { mutableStateOf(false) }
-    var recibeOfertas by remember { mutableStateOf(false) }
-    val uriHandler = LocalUriHandler.current
-    val context = LocalContext.current
+    var repeatPassword by remember { mutableStateOf("") }
+    val context = LocalContext.current // hace referencia a la vista para mostrar el Toast
 
     Scaffold(
         topBar = { SimpleTopBar(title = "Registro", showBack = true, onBack = onBack) }
     ) { padding ->
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(padding),
             contentAlignment = Alignment.Center
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text("Formulario de Registro", fontSize = 22.sp)
                 OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    label = { Text("Nombre Completo") },
+                    value = username,
+                    onValueChange = { username = it },
+                    label = { Text("Usuario") },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
@@ -114,63 +93,38 @@ fun RegisterScreen(onBack: () -> Unit) {
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Next
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = repeatPassword,
+                    onValueChange = { repeatPassword = it },
+                    label = { Text("Repetir Contraseña") },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
                         imeAction = ImeAction.Done
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
-                ExposedDropdownMenuBox(
-                    expanded = paisExpanded,
-                    onExpandedChange = { paisExpanded = !paisExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = paisSelected,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("País") },
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = paisExpanded)
-                        },
-                        modifier = Modifier.menuAnchor().fillMaxWidth()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = paisExpanded,
-                        onDismissRequest = { paisExpanded = false }
-                    ) {
-                        paises.forEach { opcion ->
-                            DropdownMenuItem(
-                                text = { Text(opcion) },
-                                onClick = {
-                                    paisSelected = opcion
-                                    paisExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = recibeNoticias, onCheckedChange = { recibeNoticias = it })
-                    Text("Recibir noticias")
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = recibeOfertas, onCheckedChange = { recibeOfertas = it })
-                    Text("Recibir ofertas")
-                }
-                Text(
-                    text = "Leer términos y condiciones",
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable {
-                        uriHandler.openUri("https://www.example.com/terminos")
-                    }
-                )
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Button(
                         onClick = {
-                            guardarRegistro(nombre, correo, password, paisSelected, recibeNoticias, recibeOfertas)
-                            Toast.makeText(
-                                context,
-                                "Datos guardados correctamente. Total registros: ${registros.size}",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            if (password == repeatPassword){
+                                Toast.makeText(
+                                    context,
+                                    "Usuario ha sido creado",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Las contraseñas no coinciden",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
                         },
                         modifier = Modifier.weight(1f)
                     ) {
