@@ -1,5 +1,6 @@
 package com.example.minutaapp
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -37,6 +39,13 @@ fun LoginScreen(
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val context = LocalContext.current // hace referencia a la vista para mostrar el Toast
+    
+    // Usuario bbdd (val no cambia)
+    val userBD = "admin"
+    val passwordBD = "1234"
+
 
     Scaffold { padding ->
         Box(
@@ -80,8 +89,28 @@ fun LoginScreen(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
+
                 Button(
-                    onClick = {  onLoginSuccess() },
+                    onClick = {
+                        // Validación previa del usuario
+                        if (username.isBlank() || password.isBlank()){
+                            Toast.makeText(
+                                context,
+                                "Los campos no pueden estar vacíos",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                        else if (username != userBD || password != passwordBD){
+                            Toast.makeText(
+                                context,
+                                "Usuario o contraseña incorrectos",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                        else {
+                            onLoginSuccess() // redirigir
+                        }
+                              },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Iniciar Sesión")

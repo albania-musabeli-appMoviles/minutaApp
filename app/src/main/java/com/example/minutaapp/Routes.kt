@@ -6,4 +6,6 @@ object Routes {
     const val FORGOT = "forgot"
 
     const val MINUTA = "minuta"
+
+    const val NEWMINUTA = "nueva_minuta"
 }

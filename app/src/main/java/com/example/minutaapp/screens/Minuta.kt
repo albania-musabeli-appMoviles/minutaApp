@@ -26,6 +26,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -36,7 +38,8 @@ import com.example.minutaapp.screens.data.Receta
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MinutaScreen(navController: NavHostController) {
+fun MinutaScreen(navController: NavHostController, recetasUsuario: MutableList<Receta>) {
+    // Lista estatica de recetas
     val recipes = listOf(
         Receta(
             nombre = "Ensalada Mediterránea",
@@ -70,6 +73,10 @@ fun MinutaScreen(navController: NavHostController) {
         )
     )
 
+
+    // Juntar ambas listas en una para mostrar en el LazyColum
+    val listaTotalRecetas = recipes + recetasUsuario
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -97,7 +104,7 @@ fun MinutaScreen(navController: NavHostController) {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* TODO: Navegar a nueva minuta o agregar receta */ },
+                onClick = { navController.navigate("nueva_minuta") },
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 elevation = FloatingActionButtonDefaults.elevation(
@@ -126,7 +133,7 @@ fun MinutaScreen(navController: NavHostController) {
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                itemsIndexed(recipes) { index, recipe ->
+                itemsIndexed(listaTotalRecetas) { index, recipe ->
                     RecipeDisplayCard(
                         index = index,
                         recipe = recipe
