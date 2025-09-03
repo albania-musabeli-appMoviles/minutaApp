@@ -61,7 +61,7 @@ fun AppNav(){
             LoginScreen (
                 onGoRegister = { navController.navigate(Routes.REGISTER) },
                 onGoForgot = { navController.navigate(Routes.FORGOT) },
-                onLoginSuccess = { navController.navigate(Routes.MINUTA) }
+                onLoginSuccess = { navController.navigate(Routes.MINUTA) },
             )
         }
         composable(Routes.REGISTER){

@@ -110,6 +110,12 @@ fun RegisterScreen(onBack: () -> Unit) {
                     modifier = Modifier.fillMaxWidth()
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    OutlinedButton(
+                        onClick = onBack,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Cancelar")
+                    }
                     Button(
                         onClick = {
                             if (password == repeatPassword){
@@ -130,12 +136,7 @@ fun RegisterScreen(onBack: () -> Unit) {
                     ) {
                         Text("Registrarme")
                     }
-                    OutlinedButton(
-                        onClick = onBack,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Cancelar")
-                    }
+
                 }
             }
         }

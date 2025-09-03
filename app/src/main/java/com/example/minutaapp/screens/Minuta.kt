@@ -15,6 +15,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -26,7 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.minutaapp.screens.data.Receta
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,6 +82,10 @@ fun MinutaScreen(navController: NavHostController, recetasUsuario: MutableList<R
     // Juntar ambas listas en una para mostrar en el LazyColum
     val listaTotalRecetas = recipes + recetasUsuario
 
+    // Estado para la visibilidad del menú en icono de configuración
+    var showMenu by remember { mutableStateOf(false) }
+
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -88,10 +97,31 @@ fun MinutaScreen(navController: NavHostController, recetasUsuario: MutableList<R
                     )
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: Implementar acción ajustes */ }) {
+                    IconButton(onClick = { showMenu = !showMenu }) {
                         Icon(
                             imageVector = Icons.Filled.Settings,
                             contentDescription = "Ajustes"
+                        )
+                    }
+                    // Menu desplegable para icono de configuracion
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Cerrar Sesión") },
+                            onClick = {
+                                showMenu = false
+                                navController.navigate("login")
+                            }
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text("Mi perfil") },
+                            onClick = {
+                                showMenu = false
+                                navController.navigate("profile")
+                            }
                         )
                     }
                 },

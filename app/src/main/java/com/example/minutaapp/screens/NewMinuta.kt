@@ -19,6 +19,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -183,10 +184,10 @@ fun NewMinutaScreen(navController: NavHostController, onRecetaAgregada: (Receta)
             // Botones
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Boton Cancelar
-                Button(
+                OutlinedButton(
                     onClick = {
                         // Redirigir a la lista de minutas sin guardar
                         navController.navigate("minuta"){
