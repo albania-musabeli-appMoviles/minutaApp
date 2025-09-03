@@ -115,14 +115,6 @@ fun MinutaScreen(navController: NavHostController, recetasUsuario: MutableList<R
                                 navController.navigate("login")
                             }
                         )
-
-                        DropdownMenuItem(
-                            text = { Text("Mi perfil") },
-                            onClick = {
-                                showMenu = false
-                                navController.navigate("profile")
-                            }
-                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
