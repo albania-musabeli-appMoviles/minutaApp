@@ -1,6 +1,7 @@
 package com.example.minutaapp.screens
 
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,44 +44,7 @@ import androidx.compose.runtime.setValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MinutaScreen(navController: NavHostController, recetasUsuario: MutableList<Receta>) {
-    // Lista estatica de recetas
-    val recipes = listOf(
-        Receta(
-            nombre = "Ensalada Mediterránea",
-            ingredientes = listOf("Lechuga", "Tomate", "Pepino", "Aceitunas", "Queso Feta"),
-            tipo = "Almuerzo",
-            recomendacionNutricional = "Rica en fibra y antioxidantes, ideal para una dieta equilibrada."
-        ),
-        Receta(
-            nombre = "Avena con Frutas",
-            ingredientes = listOf("Avena", "Leche", "Plátano", "Fresas", "Miel"),
-            tipo = "Desayuno",
-            recomendacionNutricional = "Alta en carbohidratos complejos y vitaminas, perfecta para empezar el día."
-        ),
-        Receta(
-            nombre = "Pollo a la Parrilla con Verduras",
-            ingredientes = listOf("Pechuga de pollo", "Brócoli", "Zanahoria", "Pimientos"),
-            tipo = "Cena",
-            recomendacionNutricional = "Alta en proteínas y baja en grasas, apoya la recuperación muscular."
-        ),
-        Receta(
-            nombre = "Batido Verde",
-            ingredientes = listOf("Espinaca", "Manzana", "Apio", "Jengibre", "Agua"),
-            tipo = "Snack",
-            recomendacionNutricional = "Desintoxicante y bajo en calorías, ideal para un refrigerio saludable."
-        ),
-        Receta(
-            nombre = "Tacos de Pescado",
-            ingredientes = listOf("Pescado blanco", "Tortillas de maíz", "Aguacate", "Col", "Salsa"),
-            tipo = "Almuerzo",
-            recomendacionNutricional = "Fuente de omega-3 y proteínas, promueve la salud cardiovascular."
-        )
-    )
-
-
-    // Juntar ambas listas en una para mostrar en el LazyColum
-    val listaTotalRecetas = recipes + recetasUsuario
+fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
 
     // Estado para la visibilidad del menú en icono de configuración
     var showMenu by remember { mutableStateOf(false) }
@@ -155,10 +119,11 @@ fun MinutaScreen(navController: NavHostController, recetasUsuario: MutableList<R
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                itemsIndexed(listaTotalRecetas) { index, recipe ->
+                itemsIndexed(recetas) { index, recipe ->
                     RecipeDisplayCard(
                         index = index,
-                        recipe = recipe
+                        recipe = recipe,
+                        onClick = { navController.navigate("recipe_detail/$index") }
                     )
                 }
             }
@@ -168,11 +133,12 @@ fun MinutaScreen(navController: NavHostController, recetasUsuario: MutableList<R
 
 
 @Composable
-fun RecipeDisplayCard(index: Int, recipe: Receta) {
+fun RecipeDisplayCard(index: Int, recipe: Receta, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
+            .clickable { onClick() }
     ) {
         Column(
             modifier = Modifier.padding(16.dp)

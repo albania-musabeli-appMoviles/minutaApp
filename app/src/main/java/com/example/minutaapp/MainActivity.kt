@@ -27,6 +27,7 @@ import androidx.navigation.compose.composable
 import com.example.minutaapp.screens.ForgotPasswordScreen
 import com.example.minutaapp.screens.MinutaScreen
 import com.example.minutaapp.screens.NewMinutaScreen
+import com.example.minutaapp.screens.RecipeDetailScreen
 import com.example.minutaapp.screens.RegisterScreen
 import com.example.minutaapp.screens.data.Receta
 
@@ -48,9 +49,45 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNav(){
     val navController = rememberNavController()
-
-    // lista para compartir entre pantallas
     val recetasUsuario = remember { mutableStateListOf<Receta>() }
+
+    // Lista estática de recetas (copiada de MinutaScreen para acceso en RecipeDetailScreen)
+    val recipes = listOf(
+        Receta(
+            nombre = "Ensalada Mediterránea",
+            ingredientes = listOf("Lechuga", "Tomate", "Pepino", "Aceitunas", "Queso Feta"),
+            tipo = "Almuerzo",
+            recomendacionNutricional = "Rica en fibra y antioxidantes, ideal para una dieta equilibrada."
+        ),
+        Receta(
+            nombre = "Avena con Frutas",
+            ingredientes = listOf("Avena", "Leche", "Plátano", "Fresas", "Miel"),
+            tipo = "Desayuno",
+            recomendacionNutricional = "Alta en carbohidratos complejos y vitaminas, perfecta para empezar el día."
+        ),
+        Receta(
+            nombre = "Pollo a la Parrilla con Verduras",
+            ingredientes = listOf("Pechuga de pollo", "Brócoli", "Zanahoria", "Pimientos"),
+            tipo = "Cena",
+            recomendacionNutricional = "Alta en proteínas y baja en grasas, apoya la recuperación muscular."
+        ),
+        Receta(
+            nombre = "Batido Verde",
+            ingredientes = listOf("Espinaca", "Manzana", "Apio", "Jengibre", "Agua"),
+            tipo = "Snack",
+            recomendacionNutricional = "Desintoxicante y bajo en calorías, ideal para un refrigerio saludable."
+        ),
+        Receta(
+            nombre = "Tacos de Pescado",
+            ingredientes = listOf("Pescado blanco", "Tortillas de maíz", "Aguacate", "Col", "Salsa"),
+            tipo = "Almuerzo",
+            recomendacionNutricional = "Fuente de omega-3 y proteínas, promueve la salud cardiovascular."
+        )
+    )
+
+    // Combinar listas de recetas
+    val listaTotalRecetas = recipes + recetasUsuario
+
 
     // CONTROLAR LA NAVEGACION (rutas)
     NavHost(
@@ -71,7 +108,7 @@ fun AppNav(){
             ForgotPasswordScreen(onBack = { navController.popBackStack() })
         }
         composable(Routes.MINUTA) {
-            MinutaScreen(navController = navController, recetasUsuario = recetasUsuario)
+            MinutaScreen(navController = navController, recetas = listaTotalRecetas)
         }
         composable(Routes.NEWMINUTA) {
             NewMinutaScreen(
@@ -81,6 +118,18 @@ fun AppNav(){
                     navController.navigate("minuta") { popUpTo("minuta") { inclusive = true } }
                 }
             )
+        }
+        composable(Routes.RECIPE_DETAIL) { backStackEntry ->
+            val recipeIndex = backStackEntry.arguments?.getString("recipeIndex")?.toIntOrNull()
+            if (recipeIndex != null && recipeIndex in listaTotalRecetas.indices) {
+                RecipeDetailScreen(
+                    navController = navController,
+                    receta = listaTotalRecetas[recipeIndex]
+                )
+            } else {
+                // Manejo de error: índice inválido
+                Text("Error: Receta no encontrada")
+            }
         }
     }
 }
