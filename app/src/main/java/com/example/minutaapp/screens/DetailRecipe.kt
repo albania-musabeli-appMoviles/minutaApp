@@ -1,9 +1,14 @@
 package com.example.minutaapp.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +22,11 @@ import com.example.minutaapp.screens.data.Receta
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeDetailScreen(navController: NavHostController, receta: Receta) {
+fun RecipeDetailScreen(
+    navController: NavHostController,
+    receta: Receta,
+    onEliminarReceta: (Receta) -> Unit
+) {
     Scaffold(
         topBar = {
             SimpleTopBar(
@@ -67,6 +76,37 @@ fun RecipeDetailScreen(navController: NavHostController, receta: Receta) {
                 text = receta.recomendacionNutricional,
                 fontSize = 16.sp
             )
+
+            /* BOTONES PARA EDITAR/ELIMINAR */
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ){
+                // Boton ELIMINAR
+                OutlinedButton(
+                    onClick = { onEliminarReceta(receta) },
+                    modifier = Modifier.weight(1f)
+
+                ) {
+                    Text("Eliminar")
+                }
+
+                // Boton EDITAR
+                Button(
+                    onClick = {
+                        // Abrir una pagina para editar la minuta con los datos
+                        navController.navigate("nueva_minuta")
+                        /*{
+                            popUpTo("minuta") { inclusive = true } // limpia la pila hasta MinutaScreen
+                        }*/
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Editar")
+                }
+
+
+            }
         }
     }
 }

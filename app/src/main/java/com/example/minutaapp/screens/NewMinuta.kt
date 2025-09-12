@@ -222,13 +222,13 @@ fun NewMinutaScreen(navController: NavHostController, onRecetaAgregada: (Receta)
                                 popUpTo("minuta") { inclusive = true } // Limpia la pila hasta Minuta Screen
                             }
                         } else {
-                    // Muestra un mensaje si el nombre está vacío
-                    Toast.makeText(
-                        context,
-                        "Por favor, ingrese un nombre para la receta",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+                            // Muestra un mensaje si el nombre está vacío
+                            Toast.makeText(
+                                context,
+                                "Por favor, ingrese un nombre para la receta",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
             },
             modifier = Modifier.weight(1f)
             ) {

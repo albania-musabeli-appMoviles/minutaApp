@@ -115,6 +115,10 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
+            Text(
+                text = "Haga click en una minuta para ver el detalle",
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(16.dp)

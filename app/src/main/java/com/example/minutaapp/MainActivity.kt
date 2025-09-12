@@ -89,6 +89,12 @@ fun AppNav(){
     val listaTotalRecetas = recipes + recetasUsuario
 
 
+    // funcion para eliminar una receta
+    fun eliminarReceta(receta: Receta){
+        recetasUsuario.remove(receta)
+    }
+
+
     // CONTROLAR LA NAVEGACION (rutas)
     NavHost(
         navController = navController,
@@ -124,7 +130,11 @@ fun AppNav(){
             if (recipeIndex != null && recipeIndex in listaTotalRecetas.indices) {
                 RecipeDetailScreen(
                     navController = navController,
-                    receta = listaTotalRecetas[recipeIndex]
+                    receta = listaTotalRecetas[recipeIndex],
+                    onEliminarReceta = { receta ->
+                        eliminarReceta(receta)
+                        navController.popBackStack() // volver a MinutaScreen
+                    }
                 )
             } else {
                 // Manejo de error: índice inválido
