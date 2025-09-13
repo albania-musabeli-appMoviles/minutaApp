@@ -4,14 +4,18 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,8 +27,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -43,10 +45,8 @@ import androidx.compose.runtime.setValue
 
 import com.example.minutaapp.screens.data.Receta
 
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
-import kotlinx.coroutines.launch
 import java.util.UUID
 
 
@@ -77,29 +77,26 @@ fun NewMinutaScreen(
             TopAppBar(
                 title = {
                     Text(
-                        if (editMode) "Editar Minuta" else "Nueva Minuta",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Volver"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    if (editMode) "Editar Minuta" else "Nueva Minuta",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
+            },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Volver"
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
             )
-        }
-        // Mostrar el Snackbar para mensaje de agregado
-        //snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-
+        )
+    }
     ){ innerPadding ->
         Column(
             modifier = Modifier
@@ -212,67 +209,87 @@ fun NewMinutaScreen(
                 }
             }
 
-            // Botones
+            // Botones para Cancelar/Guardar
+            Spacer(modifier = Modifier.height(16.dp))
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Boton Cancelar
                 OutlinedButton(
                     onClick = {
-                        // Redirigir a la lista de minutas sin guardar
-                        navController.navigate("minuta"){
-                            popUpTo("minuta") { inclusive = true } // limpia la pila hasta MinutaScreen
+                        navController.navigate("minuta") {
+                            popUpTo("minuta") { inclusive = true }
                         }
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
                 ) {
-                    Text("Cancelar")
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = "Cancelar",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                        Text("Cancelar")
+                    }
                 }
-                //Boton Guardar
                 Button(
                     onClick = {
-                        if (nombreReceta.isNotBlank() ) {
+                        if (nombreReceta.isNotBlank()) {
                             val receta = Receta(
-                                id = recetaToEdit?.id ?: UUID.randomUUID().toString(), // mantener id si es edicion
+                                id = recetaToEdit?.id ?: UUID.randomUUID().toString(),
                                 nombre = nombreReceta,
                                 ingredientes = listaIngredientes.toList(),
                                 tipo = tipoComidaSeleccionada,
                                 recomendacionNutricional = recetaToEdit?.recomendacionNutricional ?: "Añadida por el usuario"
                             )
-                            if (editMode){
-                                onRecetaEditada(receta) // Actualizar receta existente
+                            if (editMode) {
+                                onRecetaEditada(receta)
                             } else {
-                                onRecetaAgregada(receta) // agrega una nueva receta
+                                onRecetaAgregada(receta)
                             }
-
-                            // Mensaje de Toast
                             Toast.makeText(
                                 context,
                                 if (editMode) "Receta actualizada correctamente" else "Receta guardada",
                                 Toast.LENGTH_LONG
                             ).show()
-
-                            // redirigir a la lista de recetas
-                            navController.navigate("minuta"){
-                                popUpTo("minuta") { inclusive = true } // Limpia la pila hasta Minuta Screen
+                            navController.navigate("minuta") {
+                                popUpTo("minuta") { inclusive = true }
                             }
                         } else {
-                            // Muestra un mensaje si el nombre está vacío
                             Toast.makeText(
                                 context,
                                 "Por favor, ingrese un nombre para la receta",
                                 Toast.LENGTH_LONG
                             ).show()
                         }
-            },
-            modifier = Modifier.weight(1f)
-            ) {
-            Text(if (editMode) "Actualizar" else "Guardar")
+                    },
+                    modifier = Modifier.weight(1f),
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Done,
+                            contentDescription = "Guardar",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Text(if (editMode) "Actualizar" else "Guardar")
+                    }
                 }
             }
-
         }
     }
-
 }
