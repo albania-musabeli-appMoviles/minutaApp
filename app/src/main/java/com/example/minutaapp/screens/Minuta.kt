@@ -127,7 +127,7 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
                     RecipeDisplayCard(
                         index = index,
                         recipe = recipe,
-                        onClick = { navController.navigate("recipe_detail/$index") }
+                        onClick = { navController.navigate("recipe_detail/${recipe.id}") }
                     )
                 }
             }

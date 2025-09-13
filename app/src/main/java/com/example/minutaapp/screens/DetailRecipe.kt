@@ -94,11 +94,8 @@ fun RecipeDetailScreen(
                 // Boton EDITAR
                 Button(
                     onClick = {
-                        // Abrir una pagina para editar la minuta con los datos
-                        navController.navigate("nueva_minuta")
-                        /*{
-                            popUpTo("minuta") { inclusive = true } // limpia la pila hasta MinutaScreen
-                        }*/
+                        // navegar a NewMinutaScreen pasando el ID de la receta
+                        navController.navigate("nueva_minuta/${receta.id}?editMode=true")
                     },
                     modifier = Modifier.weight(1f)
                 ) {

@@ -7,6 +7,6 @@ object Routes {
     const val MINUTA = "minuta"
     const val NEWMINUTA = "nueva_minuta"
 
-    const val RECIPE_DETAIL = "recipe_detail/{recipeIndex}"
+    const val RECIPE_DETAIL = "recipe_detail/{id}"
 
 }

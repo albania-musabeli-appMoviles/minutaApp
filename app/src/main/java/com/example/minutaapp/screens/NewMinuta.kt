@@ -45,17 +45,25 @@ import com.example.minutaapp.screens.data.Receta
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewMinutaScreen(navController: NavHostController, onRecetaAgregada: (Receta) -> Unit){
+fun NewMinutaScreen(
+    navController: NavHostController,
+    onRecetaAgregada: (Receta) -> Unit,
+    onRecetaEditada: (Receta) -> Unit,
+    recetaToEdit: Receta?,
+    editMode: Boolean){
 
     // Estados para el formulario
-    var nombreReceta by remember { mutableStateOf("") }
-    var tipoComidaSeleccionada by remember { mutableStateOf("Desayuno") }
+    var nombreReceta by remember { mutableStateOf(recetaToEdit?.nombre ?: "") }
+    var tipoComidaSeleccionada by remember { mutableStateOf(recetaToEdit?.tipo ?: "Desayuno") }
     var ingredienteActual by remember { mutableStateOf("") }
-    val listaIngredientes = remember { mutableStateListOf<String>() }
+    val listaIngredientes = remember { mutableStateListOf<String>().apply {
+        if (recetaToEdit != null) addAll(recetaToEdit.ingredientes)
+    } }
     var expanded by remember { mutableStateOf(false) }
     val tiposComida = listOf("Desayuno", "Almuerzo", "Once", "Cena", "Postre")
 
@@ -66,7 +74,8 @@ fun NewMinutaScreen(navController: NavHostController, onRecetaAgregada: (Receta)
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Nueva Minuta",
+                    Text(
+                        if (editMode) "Editar Minuta" else "Nueva Minuta",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -202,18 +211,23 @@ fun NewMinutaScreen(navController: NavHostController, onRecetaAgregada: (Receta)
                 Button(
                     onClick = {
                         if (nombreReceta.isNotBlank() ) {
-                            val newRecipe = Receta(
+                            val receta = Receta(
+                                id = recetaToEdit?.id ?: UUID.randomUUID().toString(), // mantener id si es edicion
                                 nombre = nombreReceta,
                                 ingredientes = listaIngredientes.toList(),
                                 tipo = tipoComidaSeleccionada,
-                                recomendacionNutricional = "Añadida por el usuario"
+                                recomendacionNutricional = recetaToEdit?.recomendacionNutricional ?: "Añadida por el usuario"
                             )
-                            onRecetaAgregada(newRecipe)
+                            if (editMode){
+                                onRecetaEditada(receta) // Actualizar receta existente
+                            } else {
+                                onRecetaAgregada(receta) // agrega una nueva receta
+                            }
 
                             // Mensaje de Toast
                             Toast.makeText(
                                 context,
-                                "Receta guardada correctamente",
+                                if (editMode) "Receta actualizada correctamente" else "Receta guardada",
                                 Toast.LENGTH_LONG
                             ).show()
 
@@ -232,7 +246,7 @@ fun NewMinutaScreen(navController: NavHostController, onRecetaAgregada: (Receta)
             },
             modifier = Modifier.weight(1f)
             ) {
-            Text("Guardar")
+            Text(if (editMode) "Actualizar" else "Guardar")
                 }
             }
 

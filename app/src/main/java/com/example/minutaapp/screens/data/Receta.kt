@@ -1,8 +1,10 @@
 package com.example.minutaapp.screens.data
 
 import java.io.Serializable
+import java.util.UUID
 
 data class Receta(
+    val id: String = UUID.randomUUID().toString(), // ID unico generado automaticamente
     val nombre: String,
     val ingredientes: List<String>,
     val tipo: String,
