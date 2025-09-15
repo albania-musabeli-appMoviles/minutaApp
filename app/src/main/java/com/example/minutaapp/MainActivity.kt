@@ -122,7 +122,7 @@ fun AppNav(){
             RegisterScreen(onBack = { navController.popBackStack() })
         }
         composable(Routes.FORGOT){
-            ForgotPasswordScreen(onBack = { navController.popBackStack() })
+            ForgotPasswordScreen(onBack = { navController.popBackStack() }, navController = navController)
         }
         composable(Routes.MINUTA) {
             MinutaScreen(navController = navController, recetas = listaTotalRecetas)
