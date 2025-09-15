@@ -53,13 +53,14 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewMinutaScreen(
-    navController: NavHostController,
-    onRecetaAgregada: (Receta) -> Unit,
-    onRecetaEditada: (Receta) -> Unit,
-    recetaToEdit: Receta?,
-    editMode: Boolean){
+    navController: NavHostController, // navegación
+    onRecetaAgregada: (Receta) -> Unit, // Función lambda para agregar una nueva receta
+    onRecetaEditada: (Receta) -> Unit, // Función lambda para actualizar una receta existente
+    recetaToEdit: Receta?, // Objeto Receta a editar
+    editMode: Boolean // Indica si el modo está en Creación o Edición
+){
 
-    // Estados para el formulario
+    // Variables de estados para el formulario
     var nombreReceta by remember { mutableStateOf(recetaToEdit?.nombre ?: "") }
     var tipoComidaSeleccionada by remember { mutableStateOf(recetaToEdit?.tipo ?: "Desayuno") }
     var ingredienteActual by remember { mutableStateOf("") }
@@ -77,6 +78,7 @@ fun NewMinutaScreen(
             TopAppBar(
                 title = {
                     Text(
+                        // Condición if: Cambia el titulo según el modo
                     if (editMode) "Editar Minuta" else "Nueva Minuta",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold
@@ -134,6 +136,7 @@ fun NewMinutaScreen(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
+                    // Bucle for each para mostrar los tipos de comida en el menú desplegable
                     tiposComida.forEach { tipoComida ->
                         DropdownMenuItem(
                             text = { Text(tipoComida) },
@@ -146,7 +149,7 @@ fun NewMinutaScreen(
                 }
             }
 
-            // Campo para añadir ingredientes
+            // Fila para añadir ingredientes
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -159,6 +162,7 @@ fun NewMinutaScreen(
                 )
                 Button(
                     onClick = {
+                        // Condición if: Verifica si el ingrediente no está vacio
                         if (ingredienteActual.isNotBlank()) {
                             listaIngredientes.add(ingredienteActual)
                             ingredienteActual = ""
@@ -171,6 +175,7 @@ fun NewMinutaScreen(
             }
 
             // Lista de ingredientes agregados
+            // Condición if: Muestra la lista sólo si tiene elementos
             if (listaIngredientes.isNotEmpty()) {
                 Text("Ingredientes:", style = MaterialTheme.typography.titleMedium)
                 LazyColumn(
@@ -210,7 +215,7 @@ fun NewMinutaScreen(
             }
 
             // Botones para Cancelar/Guardar
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp)) // Spacer: para agregar separación
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -242,6 +247,7 @@ fun NewMinutaScreen(
                 }
                 Button(
                     onClick = {
+                        // Condición if: verifica que el nombre no esté vació
                         if (nombreReceta.isNotBlank()) {
                             val receta = Receta(
                                 id = recetaToEdit?.id ?: UUID.randomUUID().toString(),
@@ -250,6 +256,7 @@ fun NewMinutaScreen(
                                 tipo = tipoComidaSeleccionada,
                                 recomendacionNutricional = recetaToEdit?.recomendacionNutricional ?: "Añadida por el usuario"
                             )
+                            // condición if: verifica si el modo es insersión o edición de receta
                             if (editMode) {
                                 onRecetaEditada(receta)
                             } else {
@@ -286,6 +293,7 @@ fun NewMinutaScreen(
                             contentDescription = "Guardar",
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
+                        // Texto del botón según el modo
                         Text(if (editMode) "Actualizar" else "Guardar")
                     }
                 }

@@ -46,7 +46,7 @@ import androidx.compose.runtime.setValue
 @Composable
 fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
 
-    // Estado para la visibilidad del menú en icono de configuración
+    // Variable de estado para la visibilidad del menú en icono de configuración
     var showMenu by remember { mutableStateOf(false) }
 
 
@@ -123,7 +123,9 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Bucle que itera sobre la lista de recetas con índices
                 itemsIndexed(recetas) { index, recipe ->
+                    // Mostrar una tarjeta por cada receta
                     RecipeDisplayCard(
                         index = index,
                         recipe = recipe,

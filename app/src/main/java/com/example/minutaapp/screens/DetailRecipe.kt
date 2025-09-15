@@ -43,6 +43,7 @@ fun RecipeDetailScreen(
     receta: Receta,
     onEliminarReceta: (Receta) -> Unit
 ) {
+    // Variable para mostrar toast
     val context = LocalContext.current
 
     Scaffold(
@@ -62,6 +63,7 @@ fun RecipeDetailScreen(
                 .verticalScroll(rememberScrollState()), // esto hace que la column sea desplazable
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Card para mostrar detalles de la receta
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -76,6 +78,7 @@ fun RecipeDetailScreen(
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ){
+                    // Titulo de la receta
                     Text(
                         text = receta.nombre,
                         fontSize = 24.sp,
@@ -83,6 +86,7 @@ fun RecipeDetailScreen(
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
+                    // Tipo de comida
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -99,6 +103,7 @@ fun RecipeDetailScreen(
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                     }
+                    // Ingredientes
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -116,6 +121,7 @@ fun RecipeDetailScreen(
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                     }
+                    // Bucle for each para mostrar cada ingrediente de la receta
                     receta.ingredientes.forEach { ingrediente ->
                         Text(
                             text = "- $ingrediente",
@@ -126,6 +132,7 @@ fun RecipeDetailScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                    // Recomendación nutricional
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,

@@ -37,12 +37,12 @@ fun LoginScreen(
     onGoForgot: () -> Unit,
     onLoginSuccess: () -> Unit
 ) {
+    // variables para almacenar los valores de los campos del formulario
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
     val context = LocalContext.current // hace referencia a la vista para mostrar el Toast
     
-    // Usuario bbdd (val no cambia)
+    // Constantes que simulan credenciales de una bbdd (val no cambia)
     val userBD = "admin"
     val passwordBD = "1234"
 
@@ -61,11 +61,13 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Logo de la aplicación
                 Image(
                     painter = painterResource(id = R.drawable.logo_nutri),
                     contentDescription = "Logo Nutrición",
                     modifier = Modifier.fillMaxWidth(0.5f)
                 )
+                // Campo para usuario
                 OutlinedTextField(
                     value = username,
                     onValueChange = { username = it },
@@ -77,6 +79,7 @@ fun LoginScreen(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
+                // Campo para contraseña
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
@@ -92,7 +95,7 @@ fun LoginScreen(
 
                 Button(
                     onClick = {
-                        // Validación previa del usuario
+                        // Condición if: Verifica si los campos están vacios
                         if (username.isBlank() || password.isBlank()){
                             Toast.makeText(
                                 context,
@@ -100,6 +103,7 @@ fun LoginScreen(
                                 Toast.LENGTH_LONG
                             ).show()
                         }
+                        // Condición if: verifica si las credenciales no coinciden con la bbdd
                         else if (username != userBD || password != passwordBD){
                             Toast.makeText(
                                 context,
@@ -108,7 +112,7 @@ fun LoginScreen(
                             ).show()
                         }
                         else {
-                            onLoginSuccess() // redirigir
+                            onLoginSuccess() // redirigir a pantalla principal
                         }
                               },
                     modifier = Modifier.fillMaxWidth()

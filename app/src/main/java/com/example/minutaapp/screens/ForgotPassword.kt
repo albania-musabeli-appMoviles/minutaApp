@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForgotPasswordScreen(onBack: () -> Unit, navController: NavHostController) {
+    // Variable de estado para almacenar el correo ingresado
     var email by remember { mutableStateOf("") }
 
     // Mensaje para mostrar toast al enviar correo de recuperación
@@ -62,6 +63,7 @@ fun ForgotPasswordScreen(onBack: () -> Unit, navController: NavHostController) {
             )
             Button(
                 onClick = {
+                    // Condición if: verifica si el campo del correo está vacío
                     if (email.isBlank()){
                         Toast.makeText(
                             context,

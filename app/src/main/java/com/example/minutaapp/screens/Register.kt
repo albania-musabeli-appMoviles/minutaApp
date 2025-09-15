@@ -109,15 +109,19 @@ fun RegisterScreen(onBack: () -> Unit) {
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
+                // Fila para organizar los botones horizontalmente
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    // Botón cancelar
                     OutlinedButton(
                         onClick = onBack,
                         modifier = Modifier.weight(1f)
                     ) {
                         Text("Cancelar")
                     }
+                    // Botón para registrar
                     Button(
                         onClick = {
+                            // Condición if: verifica si las contraseñas coinciden
                             if (password == repeatPassword){
                                 Toast.makeText(
                                     context,

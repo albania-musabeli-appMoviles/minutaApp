@@ -147,6 +147,7 @@ fun AppNav(){
         ) { backStackEntry ->
             val recetaId = backStackEntry.arguments?.getString("id")
             val receta = listaTotalRecetas.find {it.id == recetaId }
+            // Uso de condición if: verifica si la receta existe
             if (receta != null) {
                 RecipeDetailScreen(
                     navController = navController,
@@ -161,7 +162,7 @@ fun AppNav(){
                 Text("Error: Receta no encontrada")
             }
         }
-        // ruta para editar una receta
+        // ruta para editar una receta existente
         composable(
             "nueva_minuta/{id}?editMode={editMode}",
             arguments = listOf(
@@ -182,6 +183,7 @@ fun AppNav(){
                 onRecetaEditada = { recetaEditada ->
                     // Verificar si la receta es estatica (esta en recipes)
                     val isStaticRecipe = recipes.any {it.id == recetaEditada.id }
+                    // Uso de condición if
                     if (isStaticRecipe){
                         // Si es estática, actualizar o agregar en recetasEstaticasEditadas
                         val index = recetasEstaticasEditadas.indexOfFirst { it.id == recetaEditada.id }
@@ -226,6 +228,7 @@ fun SimpleTopBar(
             )
         },
         navigationIcon = {
+            // condición if: muestra el botón de retroceso si showBack es verdadero
             if (showBack){
                 IconButton(onClick = {onBack?.invoke() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
