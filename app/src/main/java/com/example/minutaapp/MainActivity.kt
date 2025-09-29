@@ -132,7 +132,7 @@ fun AppNav(){
                 navController = navController,
                 onRecetaAgregada = { nuevaReceta ->
                     recetasUsuario.add(nuevaReceta)
-                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = true } }
+                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = false } }
                 },
                 onRecetaEditada = { recetaEditada ->
                     // esta funcion no se usa en modo creación, por eso está vacía
@@ -178,7 +178,7 @@ fun AppNav(){
                 navController = navController,
                 onRecetaAgregada = { nuevaReceta ->
                     recetasUsuario.add(nuevaReceta)
-                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = true } }
+                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = false } }
                 },
                 onRecetaEditada = { recetaEditada ->
                     // Verificar si la receta es estatica (esta en recipes)
@@ -201,7 +201,7 @@ fun AppNav(){
                             recetasUsuario[index] = recetaEditada
                         }
                     }
-                    navController.navigate("minuta") {popUpTo("minuta") {inclusive = true} }
+                    navController.navigate("minuta") {popUpTo("minuta") {inclusive = false} }
                 },
             recetaToEdit = recetaToEdit,
             editMode = editMode

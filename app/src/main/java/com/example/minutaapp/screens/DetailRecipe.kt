@@ -172,11 +172,11 @@ fun RecipeDetailScreen(
                 // Boton ELIMINAR
                 OutlinedButton(
                     onClick = {
-                        Toast.makeText(context, "Receta eliminada", Toast.LENGTH_SHORT).show()
                         onEliminarReceta(receta)
-                        navController.navigate("minuta"){
-                            popUpTo("minuta"){ inclusive = true }
-                        }
+                        Toast.makeText(context, "Receta eliminada", Toast.LENGTH_SHORT).show()
+//                        navController.navigate("minuta"){
+//                            popUpTo("minuta"){ inclusive = true }
+//                        }
                               },
                     modifier = Modifier.weight(1f),
                     colors = androidx.compose.material3.ButtonDefaults.outlinedButtonColors(

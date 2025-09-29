@@ -1,6 +1,7 @@
 package com.example.minutaapp.screens
 
 
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,18 +9,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,14 +44,41 @@ import androidx.navigation.NavHostController
 import com.example.minutaapp.screens.data.Receta
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.DpOffset
+import androidx.palette.graphics.Palette
+import com.example.minutaapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
 
-    // Variable de estado para la visibilidad del menú en icono de configuración
-    var showMenu by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) } // estado para visibilidad del menu en icono de config
+    var showColorMenu by remember { mutableStateOf(false) } // estado para el menu de colores
+    var selectedColor by rememberSaveable { mutableStateOf<String?>(null) } // persistencia del color seleccionado
+
+    // Colores de las tarjetas para escoger
+    val colorOptions = listOf(
+        "Rojo" to Color(0xFFF44336),
+        "Azul" to Color(0xFF2196F3),
+        "Verde" to Color(0xFF4CAF50),
+        "Color dinámico (Palette)" to null // null indica usar Palette
+    )
+
+    // Obtener el color dinámico de Palette
+    val context = LocalContext.current
+    val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.logo_nutri)
+    val palette = Palette.from(bitmap).generate()
+    val vibrantColor = palette.vibrantSwatch?.rgb?.let { Color(it) } ?: MaterialTheme.colorScheme.surface
+
+    // Determinar el color de las cards
+    val cardColor = selectedColor?.let {colorName ->
+        colorOptions.find { it.first == colorName }?.second
+    }?: vibrantColor
 
 
     Scaffold(
@@ -114,11 +141,44 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Minuta Semanal",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(
+                    text = "Minuta Semanal",
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.alignBy(FirstBaseline)
+                )
+                IconButton(
+                    onClick = { showColorMenu = true },
+                    modifier = Modifier.alignBy(FirstBaseline)
+                    ) {
+                    Icon(
+                        imageVector = Icons.Filled.Create,
+                        contentDescription = "Color",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                DropdownMenu(
+                    expanded = showColorMenu,
+                    onDismissRequest = { showColorMenu = false },
+                    offset = DpOffset(x = 200.dp, y = 0.dp) // desplazar el menú a la derecha
+                ) {
+                    colorOptions.forEach { (colorName, _) ->
+                        DropdownMenuItem(
+                            text = { Text(colorName) },
+                            onClick = {
+                                selectedColor = colorName
+                                showColorMenu = false
+                            }
+                        )
+                    }
+                }
+            }
             Text(
                 text = "Haga click en una minuta para ver el detalle",
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -133,6 +193,7 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
                     RecipeDisplayCard(
                         index = index,
                         recipe = recipe,
+                        cardColor = cardColor, // Pasar el color seleccionado
                         onClick = { navController.navigate("recipe_detail/${recipe.id}") }
                     )
                 }
@@ -143,12 +204,13 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
 
 
 @Composable
-fun RecipeDisplayCard(index: Int, recipe: Receta, onClick: () -> Unit) {
+fun RecipeDisplayCard(index: Int, recipe: Receta, cardColor: Color, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
-            .clickable { onClick() }
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = cardColor) // usar color seleccionado
     ) {
         Column(
             modifier = Modifier.padding(16.dp)

@@ -39,28 +39,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-
 import com.example.minutaapp.screens.data.Receta
-
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import java.util.UUID
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewMinutaScreen(
-    navController: NavHostController, // navegación
-    onRecetaAgregada: (Receta) -> Unit, // Función lambda para agregar una nueva receta
-    onRecetaEditada: (Receta) -> Unit, // Función lambda para actualizar una receta existente
-    recetaToEdit: Receta?, // Objeto Receta a editar
-    editMode: Boolean // Indica si el modo está en Creación o Edición
-){
-
-    // Variables de estados para el formulario
+    navController: NavHostController,
+    onRecetaAgregada: (Receta) -> Unit,
+    onRecetaEditada: (Receta) -> Unit,
+    recetaToEdit: Receta?,
+    editMode: Boolean
+) {
     var nombreReceta by remember { mutableStateOf(recetaToEdit?.nombre ?: "") }
     var tipoComidaSeleccionada by remember { mutableStateOf(recetaToEdit?.tipo ?: "Desayuno") }
     var ingredienteActual by remember { mutableStateOf("") }
@@ -69,8 +63,6 @@ fun NewMinutaScreen(
     } }
     var expanded by remember { mutableStateOf(false) }
     val tiposComida = listOf("Desayuno", "Almuerzo", "Once", "Cena", "Postre")
-
-    // Mostrar mensaje de Toast
     val context = LocalContext.current
 
     Scaffold(
@@ -78,36 +70,34 @@ fun NewMinutaScreen(
             TopAppBar(
                 title = {
                     Text(
-                        // Condición if: Cambia el titulo según el modo
-                    if (editMode) "Editar Minuta" else "Nueva Minuta",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Volver"
+                        if (editMode) "Editar Minuta" else "Nueva Minuta",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
                     )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigate("minuta") { popUpTo("minuta") { inclusive = false } } }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Volver"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                )
             )
-        )
-    }
-    ){ innerPadding ->
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
-        ){
-            // Campos del formulario
+        ) {
             OutlinedTextField(
                 value = nombreReceta,
                 onValueChange = { nombreReceta = it },
@@ -115,7 +105,6 @@ fun NewMinutaScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Campo select para tipo de comida
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }
@@ -136,7 +125,6 @@ fun NewMinutaScreen(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    // Bucle for each para mostrar los tipos de comida en el menú desplegable
                     tiposComida.forEach { tipoComida ->
                         DropdownMenuItem(
                             text = { Text(tipoComida) },
@@ -149,7 +137,6 @@ fun NewMinutaScreen(
                 }
             }
 
-            // Fila para añadir ingredientes
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -162,7 +149,6 @@ fun NewMinutaScreen(
                 )
                 Button(
                     onClick = {
-                        // Condición if: Verifica si el ingrediente no está vacio
                         if (ingredienteActual.isNotBlank()) {
                             listaIngredientes.add(ingredienteActual)
                             ingredienteActual = ""
@@ -174,8 +160,6 @@ fun NewMinutaScreen(
                 }
             }
 
-            // Lista de ingredientes agregados
-            // Condición if: Muestra la lista sólo si tiene elementos
             if (listaIngredientes.isNotEmpty()) {
                 Text("Ingredientes:", style = MaterialTheme.typography.titleMedium)
                 LazyColumn(
@@ -191,7 +175,7 @@ fun NewMinutaScreen(
                                 .padding(horizontal = 8.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
-                        ){
+                        ) {
                             Text(
                                 text = "- $ingrediente",
                                 style = MaterialTheme.typography.bodyMedium,
@@ -214,8 +198,7 @@ fun NewMinutaScreen(
                 }
             }
 
-            // Botones para Cancelar/Guardar
-            Spacer(modifier = Modifier.height(16.dp)) // Spacer: para agregar separación
+            Spacer(modifier = Modifier.height(16.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -225,7 +208,7 @@ fun NewMinutaScreen(
                 OutlinedButton(
                     onClick = {
                         navController.navigate("minuta") {
-                            popUpTo("minuta") { inclusive = true }
+                            popUpTo("minuta") { inclusive = false }
                         }
                     },
                     modifier = Modifier.weight(1f),
@@ -245,10 +228,8 @@ fun NewMinutaScreen(
                         Text("Cancelar")
                     }
                 }
-                // Uso de BUTTON
                 Button(
                     onClick = {
-                        // Condición if: verifica que el nombre no esté vació
                         if (nombreReceta.isNotBlank()) {
                             val receta = Receta(
                                 id = recetaToEdit?.id ?: UUID.randomUUID().toString(),
@@ -257,7 +238,6 @@ fun NewMinutaScreen(
                                 tipo = tipoComidaSeleccionada,
                                 recomendacionNutricional = recetaToEdit?.recomendacionNutricional ?: "Añadida por el usuario"
                             )
-                            // condición if: verifica si el modo es insersión o edición de receta
                             if (editMode) {
                                 onRecetaEditada(receta)
                             } else {
@@ -268,9 +248,8 @@ fun NewMinutaScreen(
                                 if (editMode) "Receta actualizada correctamente" else "Receta guardada",
                                 Toast.LENGTH_LONG
                             ).show()
-                            navController.navigate("minuta") {
-                                popUpTo("minuta") { inclusive = true }
-                            }
+                            navController.popBackStack()
+                            // Navegación manejada por onRecetaAgregada/onRecetaEditada
                         } else {
                             Toast.makeText(
                                 context,
@@ -294,7 +273,6 @@ fun NewMinutaScreen(
                             contentDescription = "Guardar",
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
-                        // Texto del botón según el modo
                         Text(if (editMode) "Actualizar" else "Guardar")
                     }
                 }
