@@ -4,15 +4,19 @@ package com.example.minutaapp.screens
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -149,7 +153,16 @@ fun RecipeDisplayCard(index: Int, recipe: Receta, onClick: () -> Unit) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            Text(text = "${index + 1}. ${recipe.nombre}", style = MaterialTheme.typography.titleMedium)
+            // Composable que actua como una view personalizada para el título con índice
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.Info,
+                    contentDescription = "Índice",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "${index + 1}. ${recipe.nombre}", style = MaterialTheme.typography.titleMedium)
+            }
             Text(text = "Tipo: ${recipe.tipo}")
             Text(text = "Ingredientes: ${recipe.ingredientes.joinToString(", ")}")
             Text(text = "Recomendación: ${recipe.recomendacionNutricional}")

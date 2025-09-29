@@ -121,17 +121,21 @@ fun RecipeDetailScreen(
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                     }
-                    // Bucle for each para mostrar cada ingrediente de la receta
-                    receta.ingredientes.forEach { ingrediente ->
-                        Text(
-                            text = "- $ingrediente",
-                            fontSize = 16.sp,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 8.dp, bottom = 4.dp),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    // Uso de column como ViewGroup para agrupar los ingredientes
+                    Column(modifier = Modifier.padding(start = 24.dp)){
+                        // Bucle for each para mostrar cada ingrediente de la receta
+                        receta.ingredientes.forEach { ingrediente ->
+                            Text(
+                                text = "- $ingrediente",
+                                fontSize = 16.sp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 8.dp, bottom = 4.dp),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
+
                     // Recomendación nutricional
                     Row(
                         modifier = Modifier.fillMaxWidth(),

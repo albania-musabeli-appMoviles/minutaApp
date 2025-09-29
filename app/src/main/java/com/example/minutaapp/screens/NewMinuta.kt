@@ -245,6 +245,7 @@ fun NewMinutaScreen(
                         Text("Cancelar")
                     }
                 }
+                // Uso de BUTTON
                 Button(
                     onClick = {
                         // Condición if: verifica que el nombre no esté vació
