@@ -1,4 +1,4 @@
-package com.example.minutaapp.screens.data
+package com.example.minutaapp.data
 
 import java.io.Serializable
 import java.util.UUID

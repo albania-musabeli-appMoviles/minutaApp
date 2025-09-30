@@ -35,7 +35,7 @@ import com.example.minutaapp.screens.MinutaScreen
 import com.example.minutaapp.screens.NewMinutaScreen
 import com.example.minutaapp.screens.RecipeDetailScreen
 import com.example.minutaapp.screens.RegisterScreen
-import com.example.minutaapp.screens.data.Receta
+import com.example.minutaapp.data.Receta
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)

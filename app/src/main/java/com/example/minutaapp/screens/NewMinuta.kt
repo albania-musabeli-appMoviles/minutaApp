@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import com.example.minutaapp.screens.data.Receta
+import com.example.minutaapp.data.Receta
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import java.util.UUID

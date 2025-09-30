@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.palette.graphics.Palette
 import com.example.minutaapp.R
-import com.example.minutaapp.screens.data.Receta
+import com.example.minutaapp.data.Receta
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

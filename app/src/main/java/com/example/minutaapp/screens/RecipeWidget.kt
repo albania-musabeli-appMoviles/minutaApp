@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.minutaapp.screens.data.Receta
+import com.example.minutaapp.data.Receta
 
 @Composable
 fun RecipeWidget(
