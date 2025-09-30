@@ -179,14 +179,31 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
                     }
                 }
             }
-            Text(
-                text = "Haga click en una minuta para ver el detalle",
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
             LazyColumn(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Recipe Widget al inicio
+                item {
+                    Text(
+                        text = "Ver una receta aleatoria",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
+                    )
+                    RecipeWidget(
+                        recetas = recetas,
+                        navController = navController,
+                        cardColor = cardColor,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Text(
+                        text = "Haga click en una minuta para ver el detalle",
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+
+
                 // Bucle que itera sobre la lista de recetas con índices
                 itemsIndexed(recetas) { index, recipe ->
                     // Mostrar una tarjeta por cada receta
@@ -212,6 +229,7 @@ fun RecipeDisplayCard(index: Int, recipe: Receta, cardColor: Color, onClick: () 
             .clickable { onClick() },
         colors = CardDefaults.cardColors(containerColor = cardColor) // usar color seleccionado
     ) {
+        // uso de viewGroups (column y row)
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
