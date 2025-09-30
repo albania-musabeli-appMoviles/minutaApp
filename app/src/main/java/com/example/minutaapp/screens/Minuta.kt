@@ -1,6 +1,5 @@
 package com.example.minutaapp.screens
 
-
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,40 +32,40 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.minutaapp.screens.data.Receta
-
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.DpOffset
 import androidx.palette.graphics.Palette
 import com.example.minutaapp.R
+import com.example.minutaapp.screens.data.Receta
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
-
+fun MinutaScreen(
+    navController: NavHostController,
+    recetas: List<Receta>,
+    selectedColor: String?,
+    onColorSelected: (String?) -> Unit
+) {
     var showMenu by remember { mutableStateOf(false) } // estado para visibilidad del menu en icono de config
     var showColorMenu by remember { mutableStateOf(false) } // estado para el menu de colores
-    var selectedColor by rememberSaveable { mutableStateOf<String?>(null) } // persistencia del color seleccionado
 
-    // Colores de las tarjetas para escoger
+    // Colores de las tarjetas para escoger (tonos pastel)
     val colorOptions = listOf(
         "Rojo" to Color(0xFFF44336),
         "Azul" to Color(0xFF2196F3),
         "Verde" to Color(0xFF4CAF50),
-        "Color dinámico (Palette)" to null // null indica usar Palette
+        "Color dinámico (Palette)" to null
     )
 
     // Obtener el color dinámico de Palette
@@ -76,10 +75,9 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
     val vibrantColor = palette.vibrantSwatch?.rgb?.let { Color(it) } ?: MaterialTheme.colorScheme.surface
 
     // Determinar el color de las cards
-    val cardColor = selectedColor?.let {colorName ->
+    val cardColor = selectedColor?.let { colorName ->
         colorOptions.find { it.first == colorName }?.second
-    }?: vibrantColor
-
+    } ?: vibrantColor
 
     Scaffold(
         topBar = {
@@ -98,7 +96,6 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
                             contentDescription = "Ajustes"
                         )
                     }
-                    // Menu desplegable para icono de configuracion
                     DropdownMenu(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
@@ -147,16 +144,16 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
                     .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 Text(
                     text = "Minuta Semanal",
                     style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.alignBy(FirstBaseline)
+                    modifier = Modifier.alignBy(androidx.compose.ui.layout.FirstBaseline)
                 )
                 IconButton(
                     onClick = { showColorMenu = true },
-                    modifier = Modifier.alignBy(FirstBaseline)
-                    ) {
+                    modifier = Modifier.alignBy(androidx.compose.ui.layout.FirstBaseline)
+                ) {
                     Icon(
                         imageVector = Icons.Filled.Create,
                         contentDescription = "Color",
@@ -166,13 +163,13 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
                 DropdownMenu(
                     expanded = showColorMenu,
                     onDismissRequest = { showColorMenu = false },
-                    offset = DpOffset(x = 200.dp, y = 0.dp) // desplazar el menú a la derecha
+                    offset = DpOffset(x = 200.dp, y = 0.dp)
                 ) {
                     colorOptions.forEach { (colorName, _) ->
                         DropdownMenuItem(
                             text = { Text(colorName) },
                             onClick = {
-                                selectedColor = colorName
+                                onColorSelected(colorName)
                                 showColorMenu = false
                             }
                         )
@@ -183,7 +180,6 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Recipe Widget al inicio
                 item {
                     Text(
                         text = "Ver una receta aleatoria",
@@ -196,21 +192,17 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
                         cardColor = cardColor,
                         modifier = Modifier.fillMaxWidth()
                     )
-
                     Text(
                         text = "Haga click en una minuta para ver el detalle",
                         modifier = Modifier.padding(16.dp)
                     )
                 }
-
-
-                // Bucle que itera sobre la lista de recetas con índices
+                // Bucle que itera sobre la lista de recetas con indices
                 itemsIndexed(recetas) { index, recipe ->
-                    // Mostrar una tarjeta por cada receta
                     RecipeDisplayCard(
                         index = index,
                         recipe = recipe,
-                        cardColor = cardColor, // Pasar el color seleccionado
+                        cardColor = cardColor,
                         onClick = { navController.navigate("recipe_detail/${recipe.id}") }
                     )
                 }
@@ -219,7 +211,6 @@ fun MinutaScreen(navController: NavHostController, recetas: List<Receta>) {
     }
 }
 
-
 @Composable
 fun RecipeDisplayCard(index: Int, recipe: Receta, cardColor: Color, onClick: () -> Unit) {
     Card(
@@ -227,13 +218,11 @@ fun RecipeDisplayCard(index: Int, recipe: Receta, cardColor: Color, onClick: () 
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = cardColor) // usar color seleccionado
+        colors = CardDefaults.cardColors(containerColor = cardColor)
     ) {
-        // uso de viewGroups (column y row)
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            // Composable que actua como una view personalizada para el título con índice
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Filled.Info,

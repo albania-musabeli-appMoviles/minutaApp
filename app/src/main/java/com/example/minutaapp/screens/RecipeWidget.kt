@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.minutaapp.screens.data.Receta
-import kotlin.random.Random
 
 @Composable
 fun RecipeWidget(
@@ -34,48 +35,55 @@ fun RecipeWidget(
     // Estado para la receta seleccionada
     var selectedRecipe by remember { mutableStateOf(recetas.randomOrNull() ?: Receta("0", "Sin recetas", emptyList(), "N/A", "No hay recetas disponibles")) }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(cardColor) // Usar el color de las tarjetas
-            .padding(12.dp)
-            .clickable {
-                // Navegar a RecipeDetailScreen
-                navController.navigate("recipe_detail/${selectedRecipe.id}")
-            },
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = "Receta del día",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF283593)
-        )
-        Text(
-            text = selectedRecipe.nombre,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = "Tipo: ${selectedRecipe.tipo}",
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = "Ingredientes: ${selectedRecipe.ingredientes.take(3).joinToString(", ")}",
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Button(
-            onClick = {
-                // Cambiar a una receta aleatoria
-                selectedRecipe = recetas.randomOrNull() ?: selectedRecipe
-            },
-            modifier = Modifier.padding(top = 8.dp)
+
+    ElevatedCard(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.elevatedCardColors(containerColor = cardColor)
+    ){
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .background(cardColor) // Usar el color de las tarjetas
+                .padding(12.dp)
+                .clickable {
+                    // Navegar a RecipeDetailScreen
+                    navController.navigate("recipe_detail/${selectedRecipe.id}")
+                },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Cambiar Receta")
+            Text(
+                text = "Receta del día",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF333333)
+            )
+            Text(
+                text = selectedRecipe.nombre,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "Tipo: ${selectedRecipe.tipo}",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "Ingredientes: ${selectedRecipe.ingredientes.take(3).joinToString(", ")}",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Button(
+                onClick = {
+                    // Cambiar a una receta aleatoria
+                    selectedRecipe = recetas.randomOrNull() ?: selectedRecipe
+                },
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                Text("Cambiar Receta")
+            }
         }
     }
+
 }
