@@ -32,12 +32,19 @@ import androidx.compose.material3.IconButton
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.text.input.VisualTransformation
 import com.example.minutaapp.R
+import com.example.minutaapp.data.RegistroDbHelper
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(onBack: () -> Unit) {
+fun RegisterScreen(
+    onBack: () -> Unit,
+    onRegisterSuccess: () -> Unit // funcion para redirigir luego del registro exitoso
+) {
+
     var username by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -45,6 +52,8 @@ fun RegisterScreen(onBack: () -> Unit) {
     val context = LocalContext.current // hace referencia a la vista para mostrar el Toast
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isRepeatPasswordVisible by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
 
     Scaffold(
         topBar = { SimpleTopBar(title = "Registro", showBack = true, onBack = onBack) }
@@ -138,26 +147,36 @@ fun RegisterScreen(onBack: () -> Unit) {
                     // Botón para registrar
                     Button(
                         onClick = {
-                            // Condición if: verifica si las contraseñas coinciden
-                            if (password == repeatPassword){
-                                Toast.makeText(
+                            coroutineScope.launch {
+                                RegistroDbHelper.guardarRegistro(
                                     context,
-                                    "Usuario ha sido creado",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Las contraseñas no coinciden",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                                    username,
+                                    correo,
+                                    password,
+                                    repeatPassword
+                                ) { result ->
+                                    if (result.ok) {
+                                        Toast.makeText(
+                                            context,
+                                            "Usuario registrado con éxito",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                        onRegisterSuccess()
+                                    } else {
+                                        val mensaje = result.errores.joinToString("\n")
+                                        Toast.makeText(
+                                            context,
+                                            mensaje,
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                }
                             }
                         },
-                        modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f)
                     ) {
                         Text("Registrarme")
                     }
-
                 }
             }
         }

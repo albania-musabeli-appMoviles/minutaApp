@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +32,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.minutaapp.data.RegistroDbHelper
+import com.example.minutaapp.data.UsuarioDao
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,15 +44,12 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit
 ) {
     // variables para almacenar los valores de los campos del formulario
-    var username by remember { mutableStateOf("") }
+    var correo by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current // hace referencia a la vista para mostrar el Toast
+    val coroutineScope = rememberCoroutineScope()
     
-    // Constantes que simulan credenciales de una bbdd (val no cambia)
-    val userBD = "admin"
-    val passwordBD = "1234"
-
 
     Scaffold { padding ->
         Box(
@@ -72,9 +73,9 @@ fun LoginScreen(
                 )
                 // Campo para usuario
                 OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
-                    label = { Text("Usuario") },
+                    value = correo,
+                    onValueChange = { correo = it },
+                    label = { Text("Correo") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -108,26 +109,33 @@ fun LoginScreen(
 
                 Button(
                     onClick = {
-                        // Condición if: Verifica si los campos están vacios
-                        if (username.isBlank() || password.isBlank()){
+                        if (correo.isBlank() || password.isBlank()) {
                             Toast.makeText(
                                 context,
                                 "Los campos no pueden estar vacíos",
                                 Toast.LENGTH_LONG
                             ).show()
+                        } else {
+                            coroutineScope.launch {
+                                RegistroDbHelper.autenticar(context, correo, password) { result ->
+                                    if (result.ok) {
+                                        Toast.makeText(
+                                            context,
+                                            "Inicio de sesión exitoso",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                        onLoginSuccess()
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            result.mensaje ?: "Error desconocido",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                }
+                            }
                         }
-                        // Condición if: verifica si las credenciales no coinciden con la bbdd
-                        else if (username != userBD || password != passwordBD){
-                            Toast.makeText(
-                                context,
-                                "Usuario o contraseña incorrectos",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                        else {
-                            onLoginSuccess() // redirigir a pantalla principal
-                        }
-                              },
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Iniciar Sesión")

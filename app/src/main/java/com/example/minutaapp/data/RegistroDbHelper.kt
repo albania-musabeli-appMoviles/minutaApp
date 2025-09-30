@@ -15,13 +15,11 @@ object RegistroDbHelper {
         val errores: List<String> = emptyList()
     )
 
-
     data class LoginResult(
         val ok: Boolean,
         val mensaje: String? = null,
         val usuario: Usuario? = null
     )
-
 
     // validar antes de guardar
     fun validarRegistro(
@@ -48,6 +46,9 @@ object RegistroDbHelper {
             errores += "La contraseña debe tener al menos 6 caracteres"
         }
 
+        if (password != repeatPassword){
+            errores += "Las contraseñas no coinciden"
+        }
 
         // Validar que el correo sea unico en la base de datos (consulta en Room)
         if (errores.isEmpty()){
@@ -87,8 +88,7 @@ object RegistroDbHelper {
             val usuario = Usuario(
                 username = username,
                 correo = correo,
-                password = password,
-                repeatPassword = repeatPassword
+                password = password
             )
 
             // conectar a la bbdd
@@ -96,7 +96,6 @@ object RegistroDbHelper {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     db.usuarioDao().insertar(usuario)
-
                     withContext(Dispatchers.Main){
                         callback(ValidationResult(true))
                     }

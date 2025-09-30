@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -10,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.minutaapp"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -60,4 +61,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("androidx.palette:palette:1.0.0")
+
+    // Room
+    implementation("androidx.room:room-runtime:2.8.1")  // runtime obligatorio
+    kapt("androidx.room:room-compiler:2.8.1") // genera AppDatabase_Impl
+    implementation("androidx.room:room-ktx:2.8.1") // corrutinas y helpers
 }

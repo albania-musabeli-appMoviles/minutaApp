@@ -124,7 +124,14 @@ fun AppNav(){
             )
         }
         composable(Routes.REGISTER){
-            RegisterScreen(onBack = { navController.popBackStack() })
+            RegisterScreen(
+                onBack = { navController.popBackStack() },
+                onRegisterSuccess = {
+                    navController.navigate(Routes.LOGIN) {
+                        popUpTo(Routes.REGISTER) { inclusive = true }
+                    }
+                }
+            )
         }
         composable(Routes.FORGOT){
             ForgotPasswordScreen(onBack = { navController.popBackStack() }, navController = navController)
