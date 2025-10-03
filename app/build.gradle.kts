@@ -53,7 +53,6 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.room.common.jvm)
     implementation(libs.androidx.room.ktx)
-    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -66,4 +65,12 @@ dependencies {
     implementation("androidx.room:room-runtime:2.8.1")  // runtime obligatorio
     kapt("androidx.room:room-compiler:2.8.1") // genera AppDatabase_Impl
     implementation("androidx.room:room-ktx:2.8.1") // corrutinas y helpers
+
+    // Unit Test
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }
