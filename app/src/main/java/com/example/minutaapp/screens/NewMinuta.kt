@@ -53,7 +53,8 @@ fun NewMinutaScreen(
     onRecetaAgregada: (Receta) -> Unit,
     onRecetaEditada: (Receta) -> Unit,
     recetaToEdit: Receta?,
-    editMode: Boolean
+    editMode: Boolean,
+    usuarioCorreo: String
 ) {
     var nombreReceta by remember { mutableStateOf(recetaToEdit?.nombre ?: "") }
     var tipoComidaSeleccionada by remember { mutableStateOf(recetaToEdit?.tipo ?: "Desayuno") }
@@ -236,7 +237,8 @@ fun NewMinutaScreen(
                                 nombre = nombreReceta,
                                 ingredientes = listaIngredientes.toList(),
                                 tipo = tipoComidaSeleccionada,
-                                recomendacionNutricional = recetaToEdit?.recomendacionNutricional ?: "Añadida por el usuario"
+                                recomendacionNutricional = recetaToEdit?.recomendacionNutricional ?: "Añadida por el usuario",
+                                usuarioCorreo = usuarioCorreo // Usar el parámetro usuarioCorreo
                             )
                             if (editMode) {
                                 onRecetaEditada(receta)
@@ -249,7 +251,6 @@ fun NewMinutaScreen(
                                 Toast.LENGTH_LONG
                             ).show()
                             navController.popBackStack()
-                            // Navegación manejada por onRecetaAgregada/onRecetaEditada
                         } else {
                             Toast.makeText(
                                 context,

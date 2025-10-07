@@ -1,6 +1,8 @@
 package com.example.minutaapp
 
+import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -14,12 +16,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavType
@@ -36,6 +40,7 @@ import com.example.minutaapp.screens.NewMinutaScreen
 import com.example.minutaapp.screens.RecipeDetailScreen
 import com.example.minutaapp.screens.RegisterScreen
 import com.example.minutaapp.data.Receta
+import com.example.minutaapp.data.RecetaDbHelper
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -55,59 +60,23 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNav(){
     val navController = rememberNavController()
-    val recetasUsuario = remember { mutableStateListOf<Receta>() }
-    val recetasEstaticasEditadas = remember { mutableStateListOf<Receta>() }
     var selectedColor by rememberSaveable { mutableStateOf<String?>(null) }
-
-    // Lista estática de recetas (copiada de MinutaScreen para acceso en RecipeDetailScreen)
-    val recipes = listOf(
-        Receta(
-            id = "1",
-            nombre = "Ensalada Mediterránea",
-            ingredientes = listOf("Lechuga", "Tomate", "Pepino", "Aceitunas", "Queso Feta"),
-            tipo = "Almuerzo",
-            recomendacionNutricional = "Rica en fibra y antioxidantes, ideal para una dieta equilibrada."
-        ),
-        Receta(
-            id = "2",
-            nombre = "Avena con Frutas",
-            ingredientes = listOf("Avena", "Leche", "Plátano", "Fresas", "Miel"),
-            tipo = "Desayuno",
-            recomendacionNutricional = "Alta en carbohidratos complejos y vitaminas, perfecta para empezar el día."
-        ),
-        Receta(
-            id = "3",
-            nombre = "Pollo a la Parrilla con Verduras",
-            ingredientes = listOf("Pechuga de pollo", "Brócoli", "Zanahoria", "Pimientos"),
-            tipo = "Cena",
-            recomendacionNutricional = "Alta en proteínas y baja en grasas, apoya la recuperación muscular."
-        ),
-        Receta(
-            id = "4",
-            nombre = "Batido Verde",
-            ingredientes = listOf("Espinaca", "Manzana", "Apio", "Jengibre", "Agua"),
-            tipo = "Snack",
-            recomendacionNutricional = "Desintoxicante y bajo en calorías, ideal para un refrigerio saludable."
-        ),
-        Receta(
-            id = "5",
-            nombre = "Tacos de Pescado",
-            ingredientes = listOf("Pescado blanco", "Tortillas de maíz", "Aguacate", "Col", "Salsa"),
-            tipo = "Almuerzo",
-            recomendacionNutricional = "Fuente de omega-3 y proteínas, promueve la salud cardiovascular."
-        )
-    )
-
-    // Combinar listas de recetas, priorizando las editadas
-    val listaTotalRecetas = recetasEstaticasEditadas + recipes.filter { staticRecipe ->
-        recetasEstaticasEditadas.none {it.id == staticRecipe.id}
-    } + recetasUsuario
+    val context = LocalContext.current
+    val recetas = remember { mutableStateListOf<Receta>() }
+    var correoUsuario by remember { mutableStateOf<String?>(null) }
 
 
-    // funcion para eliminar una receta
-    fun eliminarReceta(receta: Receta){
-        recetasUsuario.remove(receta) // eliminar recetas del usuario
-        recetasEstaticasEditadas.removeAll {it.id == receta.id} // eliminar receta estatica
+    // Obtener el correo del usuario autenticado desde SharedPreferences
+    // LaunchedEffect es para cargar las recetas del usuario autenticado al iniciar la aplicación
+    LaunchedEffect(Unit) {
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        correoUsuario = prefs.getString("correo", null)
+        correoUsuario?.let { correo ->
+            RecetaDbHelper.obtenerRecetas(context, correo) { recetasDb ->
+                recetas.clear()
+                recetas.addAll(recetasDb)
+            }
+        }
     }
 
 
@@ -116,14 +85,25 @@ fun AppNav(){
         navController = navController,
         startDestination = Routes.LOGIN
     ){
-        composable(Routes.LOGIN){
-            LoginScreen (
+        composable(Routes.LOGIN) {
+            LoginScreen(
                 onGoRegister = { navController.navigate(Routes.REGISTER) },
                 onGoForgot = { navController.navigate(Routes.FORGOT) },
-                onLoginSuccess = { navController.navigate(Routes.MINUTA) },
+                onLoginSuccess = {
+                    // Actualizar correoUsuario y cargar recetas
+                    val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                    correoUsuario = prefs.getString("correo", null)
+                    correoUsuario?.let { correo ->
+                        RecetaDbHelper.obtenerRecetas(context, correo) { recetasDb ->
+                            recetas.clear()
+                            recetas.addAll(recetasDb)
+                            navController.navigate(Routes.MINUTA)
+                        }
+                    }
+                }
             )
         }
-        composable(Routes.REGISTER){
+        composable(Routes.REGISTER) {
             RegisterScreen(
                 onBack = { navController.popBackStack() },
                 onRegisterSuccess = {
@@ -133,49 +113,87 @@ fun AppNav(){
                 }
             )
         }
-        composable(Routes.FORGOT){
+        composable(Routes.FORGOT) {
             ForgotPasswordScreen(onBack = { navController.popBackStack() }, navController = navController)
         }
         composable(Routes.MINUTA) {
-            MinutaScreen(
-                navController = navController,
-                recetas = listaTotalRecetas,
-                selectedColor = selectedColor,
-                onColorSelected = { newColor -> selectedColor = newColor }
-            )
+            correoUsuario?.let { correo ->
+                MinutaScreen(
+                    navController = navController,
+                    recetas = recetas,
+                    usuarioCorreo = correo, // Pasar usuarioCorreo
+                    selectedColor = selectedColor,
+                    onColorSelected = { newColor -> selectedColor = newColor }
+                )
+            } ?: run {
+                Text("Error: Debe iniciar sesión para ver minutas")
+            }
         }
         composable(Routes.NEWMINUTA) {
-            NewMinutaScreen(
-                navController = navController,
-                onRecetaAgregada = { nuevaReceta ->
-                    recetasUsuario.add(nuevaReceta)
-                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = false } }
-                },
-                onRecetaEditada = { recetaEditada ->
-                    // esta funcion no se usa en modo creación, por eso está vacía
-                },
-                recetaToEdit = null, // no hay receta para editar en modo crear receta
-                editMode = false // no está en modo editar
-            )
+            correoUsuario?.let { correo ->
+                NewMinutaScreen(
+                    navController = navController,
+                    onRecetaAgregada = { nuevaReceta ->
+                        // asociar la receta con el correo del usuario
+                        RecetaDbHelper.guardarReceta(context, nuevaReceta, false) { result ->
+                            if (result.ok) {
+                                RecetaDbHelper.obtenerRecetas(context, correo) { recetasDb ->
+                                    recetas.clear()
+                                    recetas.addAll(recetasDb)
+                                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = false } }
+                                }
+                            } else {
+                                Toast.makeText(context, result.mensaje ?: "Error al guardar", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    },
+                    onRecetaEditada = { recetaEditada ->
+                        // asociar la receta con el correo del usuario
+                        RecetaDbHelper.guardarReceta(context, recetaEditada, true) { result ->
+                            if (result.ok) {
+                                RecetaDbHelper.obtenerRecetas(context, correo) { recetasDb ->
+                                    recetas.clear()
+                                    recetas.addAll(recetasDb)
+                                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = false } }
+                                }
+                            } else {
+                                Toast.makeText(context, result.mensaje ?: "Error al actualizar", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    },
+                    recetaToEdit = null,
+                    editMode = false,
+                    usuarioCorreo = correo
+                )
+            }
         }
         composable(
             "recipe_detail/{id}",
-            arguments = listOf(navArgument("id"){ type = NavType.StringType })
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
         ) { backStackEntry ->
             val recetaId = backStackEntry.arguments?.getString("id")
-            val receta = listaTotalRecetas.find {it.id == recetaId }
-            // Uso de condición if: verifica si la receta existe
+            val receta = recetas.find { it.id == recetaId }
             if (receta != null) {
                 RecipeDetailScreen(
                     navController = navController,
                     receta = receta,
                     onEliminarReceta = { receta ->
-                        eliminarReceta(receta)
-                        navController.popBackStack() // volver a MinutaScreen
+                        correoUsuario?.let { correo ->
+                            RecetaDbHelper.eliminarReceta(context, receta) { result ->
+                                if (result.ok) {
+                                    RecetaDbHelper.obtenerRecetas(context, correo) { recetasDb ->
+                                        recetas.clear()
+                                        recetas.addAll(recetasDb)
+                                        navController.popBackStack()
+                                    }
+                                } else {
+                                    Toast.makeText(context, result.mensaje ?: "Error al eliminar", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
                     }
                 )
             } else {
-                // Manejo de error: índice inválido
                 Text("Error: Receta no encontrada")
             }
         }
@@ -183,46 +201,47 @@ fun AppNav(){
         composable(
             "nueva_minuta/{id}?editMode={editMode}",
             arguments = listOf(
-                navArgument("id") {type = NavType.StringType; nullable = true},
-                navArgument("editMode") {type = NavType.BoolType; defaultValue = false}
+                navArgument("id") { type = NavType.StringType; nullable = true },
+                navArgument("editMode") { type = NavType.BoolType; defaultValue = false }
             )
         ) { backStackEntry ->
             val recetaId = backStackEntry.arguments?.getString("id")
             val editMode = backStackEntry.arguments?.getBoolean("editMode") ?: false
-            val recetaToEdit = if (recetaId != null) listaTotalRecetas.find { it.id == recetaId } else null
-
-            NewMinutaScreen(
-                navController = navController,
-                onRecetaAgregada = { nuevaReceta ->
-                    recetasUsuario.add(nuevaReceta)
-                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = false } }
-                },
-                onRecetaEditada = { recetaEditada ->
-                    // Verificar si la receta es estatica (esta en recipes)
-                    val isStaticRecipe = recipes.any {it.id == recetaEditada.id }
-                    // Uso de condición if
-                    if (isStaticRecipe){
-                        // Si es estática, actualizar o agregar en recetasEstaticasEditadas
-                        val index = recetasEstaticasEditadas.indexOfFirst { it.id == recetaEditada.id }
-                        if (index != -1){
-                            recetasEstaticasEditadas[index] = recetaEditada
+            val recetaToEdit = recetas.find { it.id == recetaId }
+            correoUsuario?.let { correo ->
+                NewMinutaScreen(
+                    navController = navController,
+                    onRecetaAgregada = { nuevaReceta ->
+                        RecetaDbHelper.guardarReceta(context, nuevaReceta.copy(usuarioCorreo = correo), false) { result ->
+                            if (result.ok) {
+                                RecetaDbHelper.obtenerRecetas(context, correo) { recetasDb ->
+                                    recetas.clear()
+                                    recetas.addAll(recetasDb)
+                                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = false } }
+                                }
+                            } else {
+                                Toast.makeText(context, result.mensaje ?: "Error al guardar", Toast.LENGTH_LONG).show()
+                            }
                         }
-                        else {
-                            recetasEstaticasEditadas.add(recetaEditada)
+                    },
+                    onRecetaEditada = { recetaEditada ->
+                        RecetaDbHelper.guardarReceta(context, recetaEditada.copy(usuarioCorreo = correo), true) { result ->
+                            if (result.ok) {
+                                RecetaDbHelper.obtenerRecetas(context, correo) { recetasDb ->
+                                    recetas.clear()
+                                    recetas.addAll(recetasDb)
+                                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = false } }
+                                }
+                            } else {
+                                Toast.makeText(context, result.mensaje ?: "Error al actualizar", Toast.LENGTH_LONG).show()
+                            }
                         }
-                    }
-                    else {
-                        // Si la receta es creada por el usuario, actualizar en recetasUsuario
-                        val index = recetasUsuario.indexOfFirst { it.id == recetaEditada.id }
-                        if (index != -1){
-                            recetasUsuario[index] = recetaEditada
-                        }
-                    }
-                    navController.navigate("minuta") {popUpTo("minuta") {inclusive = false} }
-                },
-            recetaToEdit = recetaToEdit,
-            editMode = editMode
-            )
+                    },
+                    recetaToEdit = recetaToEdit,
+                    editMode = editMode,
+                    usuarioCorreo = correo
+                )
+            }
         }
     }
 }

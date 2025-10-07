@@ -61,6 +61,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("androidx.palette:palette:1.0.0")
 
+    implementation("com.google.code.gson:gson:2.11.0")
+
     // Room
     implementation("androidx.room:room-runtime:2.8.1")  // runtime obligatorio
     kapt("androidx.room:room-compiler:2.8.1") // genera AppDatabase_Impl

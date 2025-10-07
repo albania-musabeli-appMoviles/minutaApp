@@ -30,10 +30,18 @@ fun RecipeWidget(
     recetas: List<Receta>,
     navController: NavHostController,
     cardColor: Color,
+    usuarioCorreo: String,
     modifier: Modifier = Modifier
 ) {
     // Estado para la receta seleccionada
-    var selectedRecipe by remember { mutableStateOf(recetas.randomOrNull() ?: Receta("0", "Sin recetas", emptyList(), "N/A", "No hay recetas disponibles")) }
+    var selectedRecipe by remember { mutableStateOf(recetas.randomOrNull() ?:
+        Receta("0",
+            "Sin recetas",
+            emptyList(),
+            "N/A",
+            "No hay recetas disponibles",
+            usuarioCorreo = usuarioCorreo)
+    ) }
 
 
     ElevatedCard(
