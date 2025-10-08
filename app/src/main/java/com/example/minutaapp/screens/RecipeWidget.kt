@@ -64,23 +64,23 @@ fun RecipeWidget(
                 text = "Receta del día",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF333333)
+                color = Color.Black
             )
             Text(
                 text = selectedRecipe.nombre,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = Color.Black
             )
             Text(
                 text = "Tipo: ${selectedRecipe.tipo}",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurface
+                fontSize = 16.sp,
+                color = Color.Black
             )
             Text(
                 text = "Ingredientes: ${selectedRecipe.ingredientes.take(3).joinToString(", ")}",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurface
+                fontSize = 16.sp,
+                color = Color.Black
             )
             Button(
                 onClick = {
