@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,12 +47,13 @@ import androidx.palette.graphics.Palette
 import com.example.minutaapp.R
 import com.example.minutaapp.data.Receta
 import com.example.minutaapp.Routes
+import com.example.minutaapp.data.RecetaDbHelper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MinutaScreen(
     navController: NavHostController,
-    recetas: List<Receta>,
+    recetas: MutableList<Receta>,
     usuarioCorreo: String,
     selectedColor: String?,
     onColorSelected: (String?) -> Unit
@@ -78,6 +80,14 @@ fun MinutaScreen(
     val cardColor = selectedColor?.let { colorName ->
         colorOptions.find { it.first == colorName }?.second
     } ?: vibrantColor
+
+    // Cargar recetas desde la base de datos al entrar en la pantalla
+    LaunchedEffect(Unit) {
+        RecetaDbHelper.obtenerRecetas(context, usuarioCorreo) { recetasDb ->
+            recetas.clear()
+            recetas.addAll(recetasDb)
+        }
+    }
 
     Scaffold(
         topBar = {

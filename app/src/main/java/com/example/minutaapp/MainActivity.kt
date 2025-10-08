@@ -28,12 +28,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
-import com.example.minutaapp.ui.theme.MinutaAppTheme
-
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-
+import com.example.minutaapp.ui.theme.MinutaAppTheme
 import com.example.minutaapp.screens.ForgotPasswordScreen
 import com.example.minutaapp.screens.MinutaScreen
 import com.example.minutaapp.screens.NewMinutaScreen
@@ -50,24 +48,20 @@ class MainActivity : ComponentActivity() {
         setContent {
             MinutaAppTheme {
                 AppNav()
-
             }
         }
     }
 }
 
-// Navegacion y rutas
 @Composable
-fun AppNav(){
+fun AppNav() {
     val navController = rememberNavController()
-    var selectedColor by rememberSaveable { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val recetas = remember { mutableStateListOf<Receta>() }
     var correoUsuario by remember { mutableStateOf<String?>(null) }
-
+    var selectedColor by rememberSaveable { mutableStateOf<String?>(null) }
 
     // Obtener el correo del usuario autenticado desde SharedPreferences
-    // LaunchedEffect es para cargar las recetas del usuario autenticado al iniciar la aplicación
     LaunchedEffect(Unit) {
         val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         correoUsuario = prefs.getString("correo", null)
@@ -79,30 +73,32 @@ fun AppNav(){
         }
     }
 
-
-    // CONTROLAR LA NAVEGACION (rutas)
     NavHost(
         navController = navController,
         startDestination = Routes.LOGIN
-    ){
+    ) {
+        // Ruta para la pantalla de login
         composable(Routes.LOGIN) {
             LoginScreen(
                 onGoRegister = { navController.navigate(Routes.REGISTER) },
                 onGoForgot = { navController.navigate(Routes.FORGOT) },
                 onLoginSuccess = {
-                    // Actualizar correoUsuario y cargar recetas
                     val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                     correoUsuario = prefs.getString("correo", null)
                     correoUsuario?.let { correo ->
                         RecetaDbHelper.obtenerRecetas(context, correo) { recetasDb ->
                             recetas.clear()
                             recetas.addAll(recetasDb)
-                            navController.navigate(Routes.MINUTA)
+                            navController.navigate(Routes.MINUTA) {
+                                popUpTo(Routes.LOGIN) { inclusive = true }
+                            }
                         }
                     }
                 }
             )
         }
+
+        // Ruta para la pantalla de registro
         composable(Routes.REGISTER) {
             RegisterScreen(
                 onBack = { navController.popBackStack() },
@@ -113,15 +109,22 @@ fun AppNav(){
                 }
             )
         }
+
+        // Ruta para la pantalla de recuperación de contraseña
         composable(Routes.FORGOT) {
-            ForgotPasswordScreen(onBack = { navController.popBackStack() }, navController = navController)
+            ForgotPasswordScreen(
+                onBack = { navController.popBackStack() },
+                navController = navController
+            )
         }
+
+        // Ruta para la pantalla principal (MinutaScreen)
         composable(Routes.MINUTA) {
             correoUsuario?.let { correo ->
                 MinutaScreen(
                     navController = navController,
                     recetas = recetas,
-                    usuarioCorreo = correo, // Pasar usuarioCorreo
+                    usuarioCorreo = correo,
                     selectedColor = selectedColor,
                     onColorSelected = { newColor -> selectedColor = newColor }
                 )
@@ -129,18 +132,21 @@ fun AppNav(){
                 Text("Error: Debe iniciar sesión para ver minutas")
             }
         }
+
+        // Ruta para crear una nueva receta
         composable(Routes.NEWMINUTA) {
             correoUsuario?.let { correo ->
                 NewMinutaScreen(
                     navController = navController,
                     onRecetaAgregada = { nuevaReceta ->
-                        // asociar la receta con el correo del usuario
-                        RecetaDbHelper.guardarReceta(context, nuevaReceta, false) { result ->
+                        RecetaDbHelper.guardarReceta(context, nuevaReceta.copy(usuarioCorreo = correo), false) { result ->
                             if (result.ok) {
                                 RecetaDbHelper.obtenerRecetas(context, correo) { recetasDb ->
                                     recetas.clear()
                                     recetas.addAll(recetasDb)
-                                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = false } }
+                                    navController.navigate(Routes.MINUTA) {
+                                        popUpTo(Routes.MINUTA) { inclusive = false }
+                                    }
                                 }
                             } else {
                                 Toast.makeText(context, result.mensaje ?: "Error al guardar", Toast.LENGTH_LONG).show()
@@ -148,13 +154,14 @@ fun AppNav(){
                         }
                     },
                     onRecetaEditada = { recetaEditada ->
-                        // asociar la receta con el correo del usuario
-                        RecetaDbHelper.guardarReceta(context, recetaEditada, true) { result ->
+                        RecetaDbHelper.guardarReceta(context, recetaEditada.copy(usuarioCorreo = correo), true) { result ->
                             if (result.ok) {
                                 RecetaDbHelper.obtenerRecetas(context, correo) { recetasDb ->
                                     recetas.clear()
                                     recetas.addAll(recetasDb)
-                                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = false } }
+                                    navController.navigate(Routes.MINUTA) {
+                                        popUpTo(Routes.MINUTA) { inclusive = false }
+                                    }
                                 }
                             } else {
                                 Toast.makeText(context, result.mensaje ?: "Error al actualizar", Toast.LENGTH_LONG).show()
@@ -167,6 +174,8 @@ fun AppNav(){
                 )
             }
         }
+
+        // Ruta para los detalles de la receta
         composable(
             "recipe_detail/{id}",
             arguments = listOf(navArgument("id") { type = NavType.StringType })
@@ -177,27 +186,30 @@ fun AppNav(){
                 RecipeDetailScreen(
                     navController = navController,
                     receta = receta,
-                    onEliminarReceta = { receta ->
+                    onEliminar = {
                         correoUsuario?.let { correo ->
                             RecetaDbHelper.eliminarReceta(context, receta) { result ->
                                 if (result.ok) {
                                     RecetaDbHelper.obtenerRecetas(context, correo) { recetasDb ->
                                         recetas.clear()
                                         recetas.addAll(recetasDb)
-                                        navController.popBackStack()
                                     }
                                 } else {
                                     Toast.makeText(context, result.mensaje ?: "Error al eliminar", Toast.LENGTH_LONG).show()
                                 }
                             }
+                            navController.popBackStack()
                         }
                     }
                 )
             } else {
-                Text("Error: Receta no encontrada")
+                LaunchedEffect(Unit) {
+                    navController.popBackStack()
+                }
             }
         }
-        // ruta para editar una receta existente
+
+        // Ruta para editar una receta existente
         composable(
             "nueva_minuta/{id}?editMode={editMode}",
             arguments = listOf(
@@ -217,7 +229,9 @@ fun AppNav(){
                                 RecetaDbHelper.obtenerRecetas(context, correo) { recetasDb ->
                                     recetas.clear()
                                     recetas.addAll(recetasDb)
-                                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = false } }
+                                    navController.navigate(Routes.MINUTA) {
+                                        popUpTo(Routes.MINUTA) { inclusive = false }
+                                    }
                                 }
                             } else {
                                 Toast.makeText(context, result.mensaje ?: "Error al guardar", Toast.LENGTH_LONG).show()
@@ -230,7 +244,9 @@ fun AppNav(){
                                 RecetaDbHelper.obtenerRecetas(context, correo) { recetasDb ->
                                     recetas.clear()
                                     recetas.addAll(recetasDb)
-                                    navController.navigate("minuta") { popUpTo("minuta") { inclusive = false } }
+                                    navController.navigate(Routes.MINUTA) {
+                                        popUpTo(Routes.MINUTA) { inclusive = false }
+                                    }
                                 }
                             } else {
                                 Toast.makeText(context, result.mensaje ?: "Error al actualizar", Toast.LENGTH_LONG).show()
@@ -246,15 +262,13 @@ fun AppNav(){
     }
 }
 
-
-// Crear un TopBar reutilizable para las paginas RegisterScreen y ForgotPasswordScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SimpleTopBar(
     title: String,
     showBack: Boolean,
     onBack: (() -> Unit)? = null
-){
+) {
     TopAppBar(
         title = {
             Text(
@@ -264,9 +278,8 @@ fun SimpleTopBar(
             )
         },
         navigationIcon = {
-            // condición if: muestra el botón de retroceso si showBack es verdadero
-            if (showBack){
-                IconButton(onClick = {onBack?.invoke() }) {
+            if (showBack) {
+                IconButton(onClick = { onBack?.invoke() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
                 }
             }
