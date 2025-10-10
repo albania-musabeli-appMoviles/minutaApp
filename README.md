@@ -2,7 +2,7 @@
 
 Aplicación móvil desarrollada en Kotlin con Jetpack Compose, diseñada para ayudar a las personas, especialmente a aquellas con poca experiencia tecnológica, a planificar y organizar sus comidas de manera simple y accesible.
 
-- [APK y key](https://github.com/albania-musabeli-appMoviles/minutaApp/tree/bd-recetas/apk-key)
+- [APK y key en Github](https://github.com/albania-musabeli-appMoviles/minutaApp/tree/bd-recetas/apk-key)
 
 ## Funcionalidades principales
 
@@ -31,7 +31,7 @@ Se implementaron pruebas unitarias con **JUnit** y **Mockito** para validar:
 
 ## Instalación y uso
 
-- Descargar el **archivo APK** desde el siguiente [enlace](https://github.com/albania-musabeli-appMoviles/minutaApp/blob/bd-recetas/apk-key/app-release.apk)
+- Descargar el **archivo APK** desde el siguiente [enlace](https://www.upload-apk.com/kHcTAut6Q2Pq5WC)
 - Copiar el archivo app-release.apk al dispositivo Android.
 - En el dispositivo, permitir la instalación de aplicaciones desde origenes desconocidos
 - Ejecutar la aplicación
